@@ -1,0 +1,5 @@
+## YAML Template.
+---
+name: CraftUtils
+main: com.googlemail.mcdjuady.craftutils.CraftUtils
+version: 0.1
