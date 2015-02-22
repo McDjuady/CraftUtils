@@ -8,12 +8,17 @@ package com.googlemail.mcdjuady.craftutils;
 import com.googlemail.mcdjuady.craftutils.util.Util;
 import com.googlemail.mcdjuady.craftutils.recipes.AdvancedRecipe;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  *
@@ -111,9 +116,34 @@ public class CraftingListener implements Listener {
             if (!finalRecipe.validate(matrix)) {
                 e.getInventory().setResult(null);
             } else {
-                e.getInventory().setResult(finalRecipe.getResult(matrix));
+                //e.getInventory().setResult(finalRecipe.getResult(matrix));
+                //update the result after 2 ticks (that's the lowest possible ammount)
+                //TODO use protocolLib?
+                new DelayedResultUpdate(e.getInventory(), finalRecipe.getResult(matrix)).runTaskLater(CraftUtils.getPlugin(CraftUtils.class), 2);
             }
         }
+    }
+    
+    private class DelayedResultUpdate extends BukkitRunnable {
+        private final CraftingInventory inv;
+        private final ItemStack result;
+        
+        public DelayedResultUpdate(CraftingInventory inventory, ItemStack result) {
+            inv = inventory;
+            this.result = result;
+        }
+        
+        @Override
+        public void run() {
+            System.out.println("Update Result"); //might need to update inventory
+            inv.setResult(result);
+            for (HumanEntity e : inv.getViewers()) {
+                if (e instanceof Player) {
+                    ((Player)e).updateInventory();
+                }
+            }
+        }
+        
     }
 
 }
