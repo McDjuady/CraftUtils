@@ -21,5 +21,5 @@ public class CraftUtils extends JavaPlugin {
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(new CraftingListener(), this);
     }
-
+    
 }
