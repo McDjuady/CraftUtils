@@ -5,8 +5,13 @@
  */
 package com.googlemail.mcdjuady.craftutils;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
 import com.googlemail.mcdjuady.craftutils.util.Util;
 import com.googlemail.mcdjuady.craftutils.recipes.AdvancedRecipe;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -118,12 +123,16 @@ public class CraftingListener implements Listener {
                 e.getInventory().setResult(null);
             } else {
                 /*
-                * Updating a CraftingInventory resets the result slot on the Client
-                * Since the server, for some reason, sends the matrix update the 
-                * tick after the event, we have to update the result 2 ticks after the event.
-                * This is the only way i have found to achive consistent results
-                */
-                new DelayedResultUpdate(e.getInventory(), finalRecipe).runTaskLater(CraftUtils.getPlugin(CraftUtils.class), 3);
+                 * Updating a CraftingInventory resets the result slot on the Client
+                 * Since the server, for some reason, sends the matrix update the 
+                 * tick after the event, we have to update the result 2 ticks after the event.
+                 * This is the only way i have found to achive consistent results
+                 */
+                if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+                    new ProtocolLibDelayedResultUpdate(e.getInventory(), finalRecipe).runTaskLater(CraftUtils.getPlugin(CraftUtils.class), 2);
+                } else {
+                    new DelayedResultUpdate(e.getInventory(), finalRecipe).runTaskLater(CraftUtils.getPlugin(CraftUtils.class), 2);
+                }
             }
         }
     }
@@ -142,7 +151,7 @@ public class CraftingListener implements Listener {
         public void run() {
             List<HumanEntity> viewers = inv.getViewers();
             if (inv.getType() == InventoryType.CRAFTING) {
-                viewers.add((HumanEntity)inv.getHolder());
+                viewers.add((HumanEntity) inv.getHolder());
             }
             if (viewers == null || viewers.isEmpty()) {
                 return;
@@ -151,6 +160,53 @@ public class CraftingListener implements Listener {
             for (HumanEntity e : inv.getViewers()) {
                 if (e instanceof Player) {
                     ((Player) e).updateInventory();
+                }
+            }
+        }
+
+    }
+
+    private class ProtocolLibDelayedResultUpdate extends BukkitRunnable {
+
+        private final CraftingInventory inv;
+        private final AdvancedRecipe recipe;
+
+        public ProtocolLibDelayedResultUpdate(CraftingInventory inventory, AdvancedRecipe recipe) {
+            inv = inventory;
+            this.recipe = recipe;
+        }
+
+        @Override
+        public void run() {
+            List<HumanEntity> viewers = inv.getViewers();
+            if (inv.getType() == InventoryType.CRAFTING) {
+                viewers.add((HumanEntity) inv.getHolder());
+            }
+            if (viewers == null || viewers.isEmpty()) {
+                return;
+            }
+            ItemStack result = recipe.getResult(inv.getMatrix());
+            inv.setResult(result);
+            for (HumanEntity e : inv.getViewers()) {
+                if (e instanceof Player) {
+                    try {
+                        //Find the current window id
+                        Method m = e.getClass().getMethod("getHandle");
+                        Object playerEntity = m.invoke(e);
+                        Object activeContainer = playerEntity.getClass().getField("activeContainer").get(playerEntity);
+                        int windowId = activeContainer.getClass().getField("windowId").getInt(activeContainer);
+                        int slot = 0;
+                        PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SET_SLOT);
+                        packet.getIntegers().write(0, windowId).write(1, slot);
+                        packet.getItemModifier().write(0, result);
+                        ProtocolLibrary.getProtocolManager().sendServerPacket((Player) e, packet);
+                    } catch (InvocationTargetException ex) {
+                        Bukkit.getLogger().info(ex.getMessage());
+                    } catch (NoSuchMethodException ex) {
+                        Bukkit.getLogger().info("An internal method is out of date. Please contact the developer");
+                    } catch (SecurityException | IllegalAccessException | IllegalArgumentException | NoSuchFieldException ex) {
+                        Bukkit.getLogger().info("An internal Field Name has changed. Please contact the developer");
+                    }
                 }
             }
         }

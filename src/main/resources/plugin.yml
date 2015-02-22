@@ -4,3 +4,4 @@ name: CraftUtils
 main: com.googlemail.mcdjuady.craftutils.CraftUtils
 version: 0.1
 load: STARTUP
+softdepend: [ProtocolLib]
