@@ -116,8 +116,14 @@ public class CraftingListener implements Listener {
             if (!finalRecipe.validate(matrix)) {
                 e.getInventory().setResult(null);
             } else {
-                //update the result after 2 ticks, else the client doesn't display the result item
-                new DelayedResultUpdate(e.getInventory(), finalRecipe).runTaskLater(CraftUtils.getPlugin(CraftUtils.class), 2);
+                /*
+                * Updating a CraftingInventory resets the result slot on the Client
+                * Since the server, for some reason, sends the matrix update the 
+                * tick after the event, we have to update the result 2 ticks after the event.
+                * This is the only way i have found to achive consistent results
+                * Note: This fix seems to be ping dependent, so it might not work on every server
+                */
+                new DelayedResultUpdate(e.getInventory(), finalRecipe).runTaskLater(CraftUtils.getPlugin(CraftUtils.class), 3);
             }
         }
     }
