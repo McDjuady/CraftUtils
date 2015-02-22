@@ -8,7 +8,6 @@ package com.googlemail.mcdjuady.craftutils;
 import com.googlemail.mcdjuady.craftutils.util.Util;
 import com.googlemail.mcdjuady.craftutils.recipes.AdvancedRecipe;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,7 +33,6 @@ public class CraftingListener implements Listener {
                 if (recipe.validate(e.getInventory().getMatrix())) {
                     //Set the result
                     e.getInventory().setResult(recipe.getResult(e.getInventory().getMatrix()));
-                    Bukkit.getLogger().info("Recipe for "+e.getRecipe().getResult().getType()+" "+recipe.getClass().getName());
                     return;
                 }
             }
@@ -106,8 +104,15 @@ public class CraftingListener implements Listener {
                 }
                 Util.decreaseItems(matrix, 1, costMatrix);
                 e.getView().setCursor(mouse);
+                //Result item dissapears
+                //Send a packet to update this slot manually? 
             }
             e.getInventory().setMatrix(matrix);
+            if (!finalRecipe.validate(matrix)) {
+                e.getInventory().setResult(null);
+            } else {
+                e.getInventory().setResult(finalRecipe.getResult(matrix));
+            }
         }
     }
 
