@@ -116,34 +116,36 @@ public class CraftingListener implements Listener {
             if (!finalRecipe.validate(matrix)) {
                 e.getInventory().setResult(null);
             } else {
-                //e.getInventory().setResult(finalRecipe.getResult(matrix));
-                //update the result after 2 ticks (that's the lowest possible ammount)
-                //TODO use protocolLib?
-                new DelayedResultUpdate(e.getInventory(), finalRecipe.getResult(matrix)).runTaskLater(CraftUtils.getPlugin(CraftUtils.class), 2);
+                //update the result after 2 ticks, else the client doesn't display the result item
+                new DelayedResultUpdate(e.getInventory(), finalRecipe).runTaskLater(CraftUtils.getPlugin(CraftUtils.class), 2);
             }
         }
     }
-    
+
     private class DelayedResultUpdate extends BukkitRunnable {
+
         private final CraftingInventory inv;
-        private final ItemStack result;
-        
-        public DelayedResultUpdate(CraftingInventory inventory, ItemStack result) {
+        private final AdvancedRecipe recipe;
+
+        public DelayedResultUpdate(CraftingInventory inventory, AdvancedRecipe recipe) {
             inv = inventory;
-            this.result = result;
+            this.recipe = recipe;
         }
-        
+
         @Override
         public void run() {
-            System.out.println("Update Result"); //might need to update inventory
-            inv.setResult(result);
+            List<HumanEntity> viewers = inv.getViewers();
+            if (viewers == null || viewers.isEmpty()) {
+                return;
+            }
+            inv.setResult(recipe.getResult(inv.getMatrix()));
             for (HumanEntity e : inv.getViewers()) {
                 if (e instanceof Player) {
-                    ((Player)e).updateInventory();
+                    ((Player) e).updateInventory();
                 }
             }
         }
-        
+
     }
 
 }
