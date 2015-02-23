@@ -80,4 +80,5 @@ With those simple steps you should now be able to clone Name Tags
 ### Example Projects
 
 [EnderWarp](https://github.com/McDjuady/EnderWarp) - A Plugin using AdvancedShapelessRecipes to teleport to beacons
+
 [EnderFly](https://github.com/McDjuady/EnderFly) - A Plugin using AdvancedShapedRecipes to allow flight in SMP
