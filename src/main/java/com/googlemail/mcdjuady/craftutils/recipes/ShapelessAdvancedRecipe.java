@@ -13,25 +13,31 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.material.MaterialData;
 
 /**
- *
+ * This class is used for AdvancedShapelessRecipes
+ * It provides enhanced functionality to Bukkit's ShapelessRecipes
+ * @see ShapelessRecipe
+ * @see ShapelessValidator
  * @author Max
  */
 public class ShapelessAdvancedRecipe extends ShapelessRecipe implements AdvancedRecipe {
 
-    private ShapelessValidator result;
+    private final ShapelessValidator result;
 
     public ShapelessAdvancedRecipe(ItemStack result, ShapelessValidator validator) {
         super(result);
         this.result = validator;
     }
 
+    @Override
     public boolean validate(ItemStack[] matrix) {
         List<ItemStack> ingredients = generateIngredientList(matrix);
         return result.validate(ingredients);
     }
 
+    @Override
     public ItemStack getResult(ItemStack[] matrix) {
         List<ItemStack> ingredients = generateIngredientList(matrix);
         ItemStack resultItem = result.getResult(ingredients);
@@ -59,10 +65,10 @@ public class ShapelessAdvancedRecipe extends ShapelessRecipe implements Advanced
     }
 
     private List<ItemStack> generateIngredientList(ItemStack[] items) {
-        List<ItemStack> ingredients = new LinkedList<ItemStack>();
-        for (int i = 0; i < items.length; i++) {
-            if (items[i] != null && items[i].getType() != Material.AIR) {
-                ingredients.add(items[i]);
+        List<ItemStack> ingredients = new LinkedList<>();
+        for (ItemStack item : items) {
+            if (item != null && item.getType() != Material.AIR) {
+                ingredients.add(item);
             }
         }
         return ingredients;
@@ -75,7 +81,7 @@ public class ShapelessAdvancedRecipe extends ShapelessRecipe implements Advanced
         for (ItemStack item : matrixList) {
             for (ItemStack ingredient : ingredients) {
                 if (ingredient.getType() == item.getType()) {
-                    int ammount = ingredient.getAmount()-1;
+                    int ammount = ingredient.getAmount() - 1;
                     if (ammount <= 0) {
                         ingredients.remove(ingredient);
                     } else {
@@ -88,4 +94,65 @@ public class ShapelessAdvancedRecipe extends ShapelessRecipe implements Advanced
         return ingredients.isEmpty();
     }
 
+//<editor-fold defaultstate="collapsed" desc="Chaining Methods">
+    @Override
+    public ShapelessAdvancedRecipe addIngredient(Material ingredient) {
+        return (ShapelessAdvancedRecipe) super.addIngredient(ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe addIngredient(MaterialData ingredient) {
+        return (ShapelessAdvancedRecipe) super.addIngredient(ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe addIngredient(Material ingredient, int rawdata) {
+        return (ShapelessAdvancedRecipe) super.addIngredient(ingredient, rawdata); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe addIngredient(int count, Material ingredient) {
+        return (ShapelessAdvancedRecipe) super.addIngredient(count, ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe addIngredient(int count, MaterialData ingredient) {
+        return (ShapelessAdvancedRecipe) super.addIngredient(count, ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe addIngredient(int count, Material ingredient, int rawdata) {
+        return (ShapelessAdvancedRecipe) super.addIngredient(count, ingredient, rawdata); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe removeIngredient(Material ingredient) {
+        return (ShapelessAdvancedRecipe) super.removeIngredient(ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe removeIngredient(MaterialData ingredient) {
+        return (ShapelessAdvancedRecipe) super.removeIngredient(ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe removeIngredient(Material ingredient, int rawdata) {
+        return (ShapelessAdvancedRecipe) super.removeIngredient(ingredient, rawdata); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe removeIngredient(int count, Material ingredient) {
+        return (ShapelessAdvancedRecipe) super.removeIngredient(count, ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe removeIngredient(int count, MaterialData ingredient) {
+        return (ShapelessAdvancedRecipe) super.removeIngredient(count, ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public ShapelessAdvancedRecipe removeIngredient(int count, Material ingredient, int rawdata) {
+        return (ShapelessAdvancedRecipe) super.removeIngredient(count, ingredient, rawdata); //To change body of generated methods, choose Tools | Templates.
+    }
+//</editor-fold>
 }

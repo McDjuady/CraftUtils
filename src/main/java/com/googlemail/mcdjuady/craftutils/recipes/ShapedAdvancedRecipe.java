@@ -7,37 +7,35 @@ package com.googlemail.mcdjuady.craftutils.recipes;
 
 import com.googlemail.mcdjuady.craftutils.validators.IngredientValidator;
 import com.googlemail.mcdjuady.craftutils.validators.ShapedResultBuilder;
-import com.googlemail.mcdjuady.craftutils.validators.ShapelessValidator;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.material.MaterialData;
 
 /**
- *
+ * This class is used for AdvancedShapedRecipes
+ * It provides enhanced functionality to Bukkit's ShapedRecipes
+ * @see ShapedRecipe
+ * @see IngredientValidator
+ * @see ShapedResultBuilder
  * @author Max
  */
 public class ShapedAdvancedRecipe extends ShapedRecipe implements AdvancedRecipe {
 
     private String rows[];
     private Map<Character, IngredientValidator> validators;
-    private ShapedResultBuilder resultBuilder;
+    private final ShapedResultBuilder resultBuilder;
 
     public ShapedAdvancedRecipe(ItemStack result, ShapedResultBuilder builder) {
         super(result);
-        validators = new HashMap<Character, IngredientValidator>();
+        validators = new HashMap<>();
         resultBuilder = builder;
     }
 
-    public ShapedAdvancedRecipe setIngredient(char character, Material ingredient, IngredientValidator validator) {
-        super.setIngredient(character, ingredient);
-        validators.put(character, validator);
-        return this;
-    }
-
+    @Override
     public boolean validate(ItemStack[] matrix) {
         return _validate(matrix, true);
     }
@@ -116,7 +114,8 @@ public class ShapedAdvancedRecipe extends ShapedRecipe implements AdvancedRecipe
         }
         return true;
     }
-    
+
+    @Override
     public ItemStack getResult(ItemStack[] matrix) {
         ItemStack item = resultBuilder.getResult(matrix);
         return (item == null || item.getType() == Material.AIR) ? new ItemStack(Material.AIR) : item;
@@ -138,10 +137,8 @@ public class ShapedAdvancedRecipe extends ShapedRecipe implements AdvancedRecipe
             Validate.isTrue(row.length() > 0 && row.length() < 4, "Crafting rows should be 1, 2, or 3 characters, not ", row.length());
         }
         this.rows = new String[shape.length];
-        for (int i = 0; i < shape.length; i++) {
-            this.rows[i] = shape[i];
-        }
-        HashMap<Character, IngredientValidator> newValidators = new HashMap<Character, IngredientValidator>();
+        System.arraycopy(shape, 0, this.rows, 0, shape.length);
+        HashMap<Character, IngredientValidator> newValidators = new HashMap<>();
         for (String row : shape) {
             for (Character c : row.toCharArray()) {
                 newValidators.put(c, validators.get(c));
@@ -153,7 +150,42 @@ public class ShapedAdvancedRecipe extends ShapedRecipe implements AdvancedRecipe
 
     @Override
     public boolean validateMaterix(ItemStack[] matrix) {
-        return _validate(matrix,false);
+        return _validate(matrix, false);
+    }  
+    
+    //<editor-fold defaultstate="collapsed" desc="Chaining Methods">
+    @Override
+    public ShapedAdvancedRecipe setIngredient(char key, Material ingredient) {
+        return (ShapedAdvancedRecipe) super.setIngredient(key, ingredient); //To change body of generated methods, choose Tools | Templates.
     }
-
+    
+    public ShapedAdvancedRecipe setIngredient(char character, Material ingredient, IngredientValidator validator) {
+        setIngredient(character, ingredient);
+        validators.put(character, validator);
+        return this;
+    }
+    
+    @Override
+    public ShapedAdvancedRecipe setIngredient(char key, Material ingredient, int raw) {
+        return (ShapedAdvancedRecipe) super.setIngredient(key, ingredient, raw); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public ShapedAdvancedRecipe setIngredient(char key, Material ingredient, int raw, IngredientValidator validator) {
+        setIngredient(key, ingredient, raw);
+        validators.put(key, validator);
+        return this;
+    }
+    
+    @Override
+    public ShapedAdvancedRecipe setIngredient(char key, MaterialData ingredient) {
+        return (ShapedAdvancedRecipe) super.setIngredient(key, ingredient); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public ShapedAdvancedRecipe setIngredient(char key, MaterialData ingredient, IngredientValidator validator) {
+        setIngredient(key, ingredient);
+        validators.put(key, validator);
+        return this;
+    }
+//</editor-fold>
+    
 }

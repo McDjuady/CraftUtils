@@ -14,12 +14,23 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class CraftUtils extends JavaPlugin {
 
+    /**
+     * @return
+     */
     public static CustomRecipeManager getRecipeManager() {
         return CustomRecipeManager.getInstance();
     }
 
+    @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(new CraftingListener(), this);
     }
 
+    @Override
+    public void onDisable() {
+        CustomRecipeManager.onDisable(); //Destroy the current recipe manager
+    }
+    
+    
+    
 }

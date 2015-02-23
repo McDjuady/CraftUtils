@@ -16,13 +16,12 @@ public class Util {
 
     public static void decreaseItems(ItemStack[] matrix, int ammount) {
         for (int i = 0; i < matrix.length; i++) {
-            ItemStack item = matrix[i];
-            if (item != null && item.getType() != Material.AIR) {
-                int amnt = item.getAmount() - ammount;
+            if (matrix[i] != null && matrix[i].getType() != Material.AIR) {
+                int amnt = matrix[i].getAmount() - ammount;
                 if (amnt <= 0) {
                     matrix[i] = new ItemStack(Material.AIR);
                 } else {
-                    item.setAmount(amnt);
+                    matrix[i].setAmount(amnt);
                 }
             }
         }

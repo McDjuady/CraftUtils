@@ -10,6 +10,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.googlemail.mcdjuady.craftutils.util.Util;
 import com.googlemail.mcdjuady.craftutils.recipes.AdvancedRecipe;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -72,11 +73,14 @@ public class CraftingListener implements Listener {
             if (finalRecipe == null) {
                 return;
             }
-            //cancel the event so we can do manual crafting
-            e.setCancelled(true);
+            //cancel the event so we can do manual crafting            
             ItemStack result = finalRecipe.getResult(matrix);
             int maxStackSize = result.getMaxStackSize();
             int[] costMatrix = finalRecipe.getCostMatrix(matrix);
+            if (costMatrix.length != matrix.length) {
+                throw new IndexOutOfBoundsException("The costMatrix isn't the same size as the craftingMatrix!");
+            }
+            e.setCancelled(true);
             if (e.isShiftClick()) {
                 //find the ammount we can craft
                 int craftable = 64;
@@ -193,9 +197,12 @@ public class CraftingListener implements Listener {
                         //Find the current window id
                         Method m = e.getClass().getMethod("getHandle");
                         Object playerEntity = m.invoke(e);
-                        Object activeContainer = playerEntity.getClass().getField("activeContainer").get(playerEntity);
-                        int windowId = activeContainer.getClass().getField("windowId").getInt(activeContainer);
+                        final Field containerField = playerEntity.getClass().getField("activeContainer");
+                        Object activeContainer = containerField.get(playerEntity);
+                        final Field windowIdField = activeContainer.getClass().getField("windowId");
+                        int windowId = windowIdField.getInt(activeContainer);
                         int slot = 0;
+                        //Build the packet
                         PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SET_SLOT);
                         packet.getIntegers().write(0, windowId).write(1, slot);
                         packet.getItemModifier().write(0, result);

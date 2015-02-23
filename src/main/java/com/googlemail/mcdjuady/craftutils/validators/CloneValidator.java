@@ -30,6 +30,9 @@ public class CloneValidator implements ShapelessValidator{
 
     @Override
     public boolean validate(List<ItemStack> ingredients) {
+        if (ingredients.size() != 2) {
+            return false;
+        }
         boolean valid = false;
         for (ItemStack item : ingredients) {
             valid = valid ^ item.hasItemMeta();
@@ -39,7 +42,7 @@ public class CloneValidator implements ShapelessValidator{
 
     @Override
     public Map<ItemStack, Integer> costMatrix(List<ItemStack> ingredients) {
-        Map<ItemStack,Integer> costMap = new HashMap<ItemStack,Integer>();
+        Map<ItemStack,Integer> costMap = new HashMap<>();
         for (ItemStack item : ingredients) {
             costMap.put(item, item.hasItemMeta() ? 0 : 1);
         }

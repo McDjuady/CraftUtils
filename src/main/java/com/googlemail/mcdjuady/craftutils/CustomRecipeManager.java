@@ -19,7 +19,7 @@ import org.bukkit.inventory.ItemStack;
  */
 public class CustomRecipeManager {
 
-    private HashMap<ItemStack, List<AdvancedRecipe>> recipes;
+    private final HashMap<ItemStack, List<AdvancedRecipe>> recipes;
 
     private static CustomRecipeManager instance;
 
@@ -29,11 +29,22 @@ public class CustomRecipeManager {
         }
         return instance;
     }
-
-    public CustomRecipeManager() {
-        recipes = new HashMap<ItemStack, List<AdvancedRecipe>>();
+    
+    protected static void onDisable() {
+        instance = null;
+    }
+    
+    private CustomRecipeManager() {
+        recipes = new HashMap<>();
     }
 
+    /**
+     * Gets a list of Recipes which fit the current crafting matrix
+     * This method ignores the Validators and just compares the shape
+     * @param result The registered result of the desired recipe
+     * @param matrix The current crafting matrix
+     * @return
+     */
     public List<AdvancedRecipe> getRecipes(ItemStack result, ItemStack[] matrix) {
         List<AdvancedRecipe> recipeList = recipes.get(result);
         List<AdvancedRecipe> retList = new ArrayList<>();
@@ -44,11 +55,23 @@ public class CustomRecipeManager {
         }
         return retList;
     }
-
+    
+    /**
+     * True if there is a recipe with the desired result
+     * @param result The desired result
+     * @return If there are recipes matching the result
+     */
     public boolean hasRecipe(ItemStack result) {
         return recipes.containsKey(result);
     }
 
+    /**
+     * Adds an AdvancedRecipe to the manager. This recipe will be tracked and
+     * the Validators will be applied accordingly
+     * This Method also registers the recipe with Bukkit 
+     * @param recipe The recipe to add
+     * @return if the recipe was successfully added
+     */
     public boolean addRecipe(AdvancedRecipe recipe) {
         if (!Bukkit.addRecipe(recipe)) {
             Bukkit.getLogger().warning("[CustomRecipes] Failed to add recipe!");
@@ -56,7 +79,7 @@ public class CustomRecipeManager {
         }
         List<AdvancedRecipe> list = recipes.get(recipe.getResult());
         if (list == null) {
-            list = new LinkedList<AdvancedRecipe>();
+            list = new LinkedList<>();
             recipes.put(recipe.getResult(), list);
         }
         Bukkit.getLogger().info("[CustomRecipes] Added custom recipe!");
