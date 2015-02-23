@@ -1,7 +1,7 @@
 CraftUtils
 ==========
 
-<What is CraftUtils?
+What is CraftUtils?
 --------------------
 
 CraftUtils is a library to extend the functionality of custom recipes for Bukkit and Spigot.
